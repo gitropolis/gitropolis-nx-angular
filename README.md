@@ -14,3 +14,10 @@ Clean up AppComponent:
 1. Remove NxWelcomeComponent.
 1. Delete app.component.spec.ts.
 1. Remove BrowserModule from AppComponent.imports.
+
+Generate Angular Material table component
+
+```powershell
+ng generate @schematics/angular:module --name=repositories
+ng generate @angular/material:table --name=repositories --changeDetection=OnPush --skipTests
+```
