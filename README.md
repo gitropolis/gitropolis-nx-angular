@@ -18,8 +18,8 @@ Clean up AppComponent:
 Generate Angular Material table component
 
 ```powershell
-ng generate @schematics/angular:module --name=repositories
-ng generate @angular/material:table --name=repositories --changeDetection=OnPush --skipTests
+ng generate @schematics/angular:module repositories
+ng generate @angular/material:table repositories --changeDetection=OnPush --skip-tests
 ```
 
 Add Octokit REST:
