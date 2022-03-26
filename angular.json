@@ -1,0 +1,7 @@
+{
+  "version": 2,
+  "projects": {
+    "gitropolis-app": "apps/gitropolis-app",
+    "gitropolis-app-e2e": "apps/gitropolis-app-e2e"
+  }
+}
