@@ -21,3 +21,24 @@ Generate Angular Material table component
 ng generate @schematics/angular:module --name=repositories
 ng generate @angular/material:table --name=repositories --changeDetection=OnPush --skipTests
 ```
+
+Add Octokit REST:
+
+```powershell
+yarn add @octokit/rest
+```
+
+```ts
+import { InjectionToken } from '@angular/core';
+import { Octokit } from '@octokit/rest';
+
+export const octokitToken = new InjectionToken<Octokit>('octokitToken', {
+  providedIn: 'root',
+  factory: () =>
+    new Octokit({
+      auth: prompt('Enter your GitHub Personal Access Token (PAT)'),
+    }),
+});
+```
+
+<figcaption>octokit.token.ts</figcaption>
