@@ -1,3 +1,7 @@
+:host {
+  display: block;
+}
+
 .full-width-table {
   width: 100%;
 }

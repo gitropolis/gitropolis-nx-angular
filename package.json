@@ -21,6 +21,7 @@
     "@angular/platform-browser": "~13.2.0",
     "@angular/platform-browser-dynamic": "~13.2.0",
     "@angular/router": "~13.2.0",
+    "@ngrx/component-store": "^13.0.2",
     "@nrwl/angular": "13.9.5",
     "@octokit/rest": "^18.12.0",
     "rxjs": "~7.4.0",

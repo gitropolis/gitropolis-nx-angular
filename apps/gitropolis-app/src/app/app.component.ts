@@ -1,10 +1,22 @@
-import { Component } from '@angular/core';
+import { Component, NgModule } from '@angular/core';
+
+import { RepositoriesScam } from './repositories/repositories.component';
 
 @Component({
-  selector: 'gitropolis-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css'],
+  selector: 'gitropolis-app',
+  template: `<gitropolis-repositories></gitropolis-repositories>`,
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+    `,
+  ],
 })
-export class AppComponent {
-  title = 'gitropolis-app';
-}
+export class AppComponent {}
+
+@NgModule({
+  declarations: [AppComponent],
+  imports: [RepositoriesScam],
+})
+export class AppScam {}

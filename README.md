@@ -42,3 +42,36 @@ export const octokitToken = new InjectionToken<Octokit>('octokitToken', {
 ```
 
 <figcaption>octokit.token.ts</figcaption>
+
+Add NgRx ComponentStore:
+
+```powershell
+yarn add @ngrx/component-store
+```
+
+```ts
+import { Inject, Injectable } from '@angular/core';
+import { ComponentStore } from '@ngrx/component-store';
+import { Octokit } from '@octokit/rest';
+import { defer } from 'rxjs';
+
+import { octokitToken } from '../octokit.token';
+
+interface RepositoriesState {}
+
+@Injectable()
+export class RepositoriesStore extends ComponentStore<RepositoriesState> {
+  authenticatedRepositories$ = this.select(
+    defer(() => this.octokit.rest.repos.listForAuthenticatedUser()),
+    (response) => response.data
+  );
+
+  constructor(@Inject(octokitToken) private octokit: Octokit) {
+    super(initialState);
+  }
+}
+
+const initialState: RepositoriesState = {};
+```
+
+<figcaption>repositories.store.ts</figcaption>
