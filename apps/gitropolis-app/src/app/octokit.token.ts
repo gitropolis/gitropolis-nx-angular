@@ -1,10 +1,12 @@
-import { InjectionToken } from '@angular/core';
+import { inject, InjectionToken } from '@angular/core';
 import { Octokit } from '@octokit/rest';
 
+import { githubAuthenticationToken } from './github-authentication.token';
+
 export const octokitToken = new InjectionToken<Octokit>('octokitToken', {
-  providedIn: 'root',
   factory: () =>
     new Octokit({
-      auth: prompt('Enter your GitHub Personal Access Token (PAT)'),
+      auth: inject(githubAuthenticationToken),
     }),
+  providedIn: 'root',
 });
