@@ -1,4 +1,6 @@
-# Nx Angular Gitropolis
+# Gitropolis: Nx Angular edition
+
+Gitropolis is a sample GitHub explorer implemented in an Nx Angular workspace.
 
 ```powershell
 yarn create nx-workspace gitropolis-nx-angular --package-manager=yarn --preset=angular --app-name=gitropolis-app --npm-scope=gitropolis --style=css --no-nx-cloud
