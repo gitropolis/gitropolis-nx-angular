@@ -2,6 +2,15 @@
   "name": "nx-angular-gitropolis",
   "version": "0.0.0",
   "license": "MIT",
+  "engines": {
+    "npm": "Use Yarn instead of NPM",
+    "node": "14.19.1",
+    "yarn": "1.22.18"
+  },
+  "volta": {
+    "node": "14.19.1",
+    "yarn": "1.22.18"
+  },
   "scripts": {
     "ng": "nx",
     "postinstall": "node ./decorate-angular-cli.js && ngcc --properties es2015 browser module main",
