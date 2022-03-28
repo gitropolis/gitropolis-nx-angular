@@ -14,26 +14,26 @@ interface RepositoriesState {
   readonly repositories: Repositories;
 }
 
-type OctokitPageNumber = number | undefined;
-type OctokitPageSize = number | undefined;
-type OctokitReposSortColumn =
-  | 'created'
-  | 'updated'
-  | 'pushed'
-  | 'full_name'
-  | undefined;
-type OcotkitSortDirection = 'asc' | 'desc' | undefined;
+type OctokitPageNumber = number;
+type OctokitPageSize = number;
+type OctokitReposSortColumn = 'created' | 'updated' | 'pushed' | 'full_name';
+type OcotkitSortDirection = 'asc' | 'desc';
 
 @Injectable()
 export class RepositoriesStore extends ComponentStore<RepositoriesState> {
   #page: Observable<PageEvent | null> = this.select(
-    (state) => state.materialPage
+    (state) => state.materialPage,
+    {
+      debounce: true,
+    }
   );
   #octokitPageNumber: Observable<OctokitPageNumber> = this.select(
     this.#page,
     (page) => {
+      const defaultPageNumber = 1;
+
       if (page === null) {
-        return undefined;
+        return defaultPageNumber;
       }
 
       return page.pageIndex + 1;
@@ -41,17 +41,22 @@ export class RepositoriesStore extends ComponentStore<RepositoriesState> {
   );
   #octokitPageSize: Observable<OctokitPageSize> = this.select(
     this.#page,
-    (page) => page?.pageSize
+    (page) => {
+      const defaultPageSize = 10;
+
+      return page?.pageSize ?? defaultPageSize;
+    }
   );
 
   #sort: Observable<Sort | null> = this.select((state) => state.materialSort);
   #octoKitSortColumn: Observable<OctokitReposSortColumn> = this.select(
     this.#sort,
     (sort): OctokitReposSortColumn => {
-      const noSortColumn = undefined;
+      const fullNameColumn = 'full_name';
+      const defaultSortColumn = fullNameColumn;
 
       if (sort === null) {
-        return noSortColumn;
+        return defaultSortColumn;
       }
 
       switch (sort.active) {
@@ -60,7 +65,7 @@ export class RepositoriesStore extends ComponentStore<RepositoriesState> {
         case 'full_name':
         // Fall through to 'fullName'
         case 'fullName':
-          return 'full_name';
+          return fullNameColumn;
         case 'updated':
           return 'updated';
         case 'pushed':
@@ -68,35 +73,25 @@ export class RepositoriesStore extends ComponentStore<RepositoriesState> {
         case '':
         // Fall through to default
         default:
-          return noSortColumn;
+          return defaultSortColumn;
       }
     }
   );
   #octokitSortDirection: Observable<OcotkitSortDirection> = this.select(
     this.#sort,
-    (sort): OcotkitSortDirection => {
-      const noDirection = undefined;
-
-      if (sort === null) {
-        return undefined;
-      }
-
-      const hasDirection = ['asc', 'desc'].includes(sort.direction);
+    this.#octoKitSortColumn,
+    (sort, ocotokitSortColumn): OcotkitSortDirection => {
+      const sortDirection = sort?.direction ?? '';
+      const hasDirection = ['asc', 'desc'].includes(sortDirection);
 
       if (hasDirection) {
-        return sort.direction as 'asc' | 'desc';
-      }
-
-      const hasActiveColumn = sort.active !== '';
-
-      if (!hasActiveColumn) {
-        return noDirection;
+        return sortDirection as 'asc' | 'desc';
       }
 
       const fullNameDefaultDirection = 'asc';
       const otherColumnDefaultDirection = 'desc';
 
-      return sort.active === 'fullName'
+      return ocotokitSortColumn === 'full_name'
         ? fullNameDefaultDirection
         : otherColumnDefaultDirection;
     }
@@ -157,7 +152,7 @@ export class RepositoriesStore extends ComponentStore<RepositoriesState> {
               (response) =>
                 this.#updateRepositories(
                   response.data.map(
-                    ({ description, full_name: fullName, url }) => ({
+                    ({ description, full_name: fullName, html_url: url }) => ({
                       description: description ?? '',
                       fullName,
                       url,
@@ -184,6 +179,6 @@ export class RepositoriesStore extends ComponentStore<RepositoriesState> {
 
 const initialState: RepositoriesState = {
   materialPage: null,
-  repositories: [],
   materialSort: null,
+  repositories: [],
 };
