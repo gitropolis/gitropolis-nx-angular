@@ -20,10 +20,12 @@ export type LoadAuthenticatedRepositoriesFn = (
 function loadAuthenticatedRepositoriesFactory(): LoadAuthenticatedRepositoriesFn {
   const octokit = inject(octokitToken);
 
+  const firstPage = undefined;
+
   return ({ pageNumber } = {}) =>
     from(
       octokit.rest.repos.listForAuthenticatedUser({
-        page: pageNumber ?? undefined,
+        page: pageNumber ?? firstPage,
         per_page: 100,
       })
     ).pipe(
