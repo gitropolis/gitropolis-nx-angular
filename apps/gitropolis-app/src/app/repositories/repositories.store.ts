@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@angular/core';
 import { ComponentStore, tapResponse } from '@ngrx/component-store';
-import { concatMap, EMPTY, pipe } from 'rxjs';
+import { concatMap, filter, map, pipe } from 'rxjs';
 
 import {
   LoadAuthenticatedRepositoriesFn,
@@ -18,6 +18,9 @@ interface RepositoriesState {
   readonly repositories: Repositories;
 }
 
+const isLastPage = ({ lastPageNumber, nextPageNumber }: Pagination): boolean =>
+  lastPageNumber === null && nextPageNumber === null;
+
 @Injectable()
 export class RepositoriesStore extends ComponentStore<RepositoriesState> {
   authenticatedRepositories$ = this.select((state) => state.repositories);
@@ -28,7 +31,7 @@ export class RepositoriesStore extends ComponentStore<RepositoriesState> {
   ) {
     super(initialState);
 
-    this.#loadRepositories(this.select((state) => state.pagination));
+    this.#loadRepositoriesOnNextPage(this.select((state) => state.pagination));
   }
 
   #appendRepositories = this.updater<Repositories>(
@@ -37,28 +40,28 @@ export class RepositoriesStore extends ComponentStore<RepositoriesState> {
       repositories: [...state.repositories, ...loadedRepositories],
     })
   );
-  #loadRepositories = this.effect<Pagination>(
+  #loadRepositoriesOnNextPage = this.effect<Pagination>(
     pipe(
-      concatMap(({ lastPageNumber, nextPageNumber }) =>
-        lastPageNumber === null && nextPageNumber === null
-          ? EMPTY
-          : this.loadAuthenticatedRepositories({
-              pageNumber: nextPageNumber,
-            }).pipe(
-              tapResponse(
-                ({ links, repositories }) => {
-                  this.#appendRepositories(repositories);
+      filter((pagination) => !isLastPage(pagination)),
+      map(({ nextPageNumber }) => nextPageNumber as number),
+      concatMap((nextPageNumber) =>
+        this.loadAuthenticatedRepositories({
+          pageNumber: nextPageNumber,
+        }).pipe(
+          tapResponse(
+            ({ links, repositories }) => {
+              this.#appendRepositories(repositories);
 
-                  this.#updatePagination({
-                    lastPageNumber: links.lastPageNumber,
-                    nextPageNumber: links.nextPageNumber,
-                  });
-                },
-                (error: unknown) => {
-                  console.error(String(error));
-                }
-              )
-            )
+              this.#updatePagination({
+                lastPageNumber: links.lastPageNumber,
+                nextPageNumber: links.nextPageNumber,
+              });
+            },
+            (error: unknown) => {
+              console.error(String(error));
+            }
+          )
+        )
       )
     )
   );
