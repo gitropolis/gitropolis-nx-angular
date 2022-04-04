@@ -61,22 +61,9 @@ export class RepositoriesStore extends ComponentStore<RepositoriesState> {
                   );
 
                   const links = OctokitLinks.fromLinkHeader(headers.link ?? '');
-                  const lastLinkedPageNumber = Number.parseInt(
-                    links.lastUrl?.searchParams.get('page') ?? '',
-                    10
-                  );
-                  const nextLinkedPageNumber = Number.parseInt(
-                    links.nextUrl?.searchParams.get('page') ?? '',
-                    10
-                  );
-
                   this.#updatePagination({
-                    lastPageNumber: Number.isNaN(lastLinkedPageNumber)
-                      ? null
-                      : lastLinkedPageNumber,
-                    nextPageNumber: Number.isNaN(nextLinkedPageNumber)
-                      ? null
-                      : nextLinkedPageNumber,
+                    lastPageNumber: links.lastPageNumber,
+                    nextPageNumber: links.nextPageNumber,
                   });
                 },
                 (error: unknown) => {

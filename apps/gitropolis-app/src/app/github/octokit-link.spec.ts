@@ -9,11 +9,13 @@ describe('OctokitLinks', () => {
 
     const actualLinks = OctokitLinks.fromLinkHeader(linkHeader);
 
-    const expectedLinks: OctokitLinks = {
+    const expectedLinks: Partial<OctokitLinks> = {
       lastUrl: new URL('https://api.github.com/user/repos?page=3&per_page=100'),
       nextUrl: new URL('https://api.github.com/user/repos?page=2&per_page=100'),
     };
     expect(actualLinks).toEqual(expectedLinks);
+    expect(actualLinks.lastPageNumber).toBe(3);
+    expect(actualLinks.nextPageNumber).toBe(2);
   });
 
   it(`
@@ -24,7 +26,7 @@ describe('OctokitLinks', () => {
 
     const actualLinks = OctokitLinks.fromLinkHeader(linkHeader);
 
-    const expectedLinks: OctokitLinks = {
+    const expectedLinks: Partial<OctokitLinks> = {
       firstUrl: new URL(
         'https://api.github.com/user/repos?page=1&per_page=100'
       ),
@@ -35,6 +37,10 @@ describe('OctokitLinks', () => {
       ),
     };
     expect(actualLinks).toEqual(expectedLinks);
+    expect(actualLinks.firstPageNumber).toBe(1);
+    expect(actualLinks.lastPageNumber).toBe(3);
+    expect(actualLinks.nextPageNumber).toBe(3);
+    expect(actualLinks.previousPageNumber).toBe(1);
   });
 
   it(`
@@ -45,7 +51,7 @@ describe('OctokitLinks', () => {
 
     const actualLinks = OctokitLinks.fromLinkHeader(linkHeader);
 
-    const expectedLinks: OctokitLinks = {
+    const expectedLinks: Partial<OctokitLinks> = {
       firstUrl: new URL(
         'https://api.github.com/user/repos?page=1&per_page=100'
       ),
@@ -54,5 +60,7 @@ describe('OctokitLinks', () => {
       ),
     };
     expect(actualLinks).toEqual(expectedLinks);
+    expect(actualLinks.firstPageNumber).toBe(1);
+    expect(actualLinks.previousPageNumber).toBe(2);
   });
 });
