@@ -1,10 +1,11 @@
 import { Inject, Injectable } from '@angular/core';
 import { ComponentStore, tapResponse } from '@ngrx/component-store';
-import { Octokit } from '@octokit/rest';
-import { concatMap, EMPTY, from, pipe } from 'rxjs';
+import { concatMap, EMPTY, pipe } from 'rxjs';
 
-import { OctokitLinks } from '../github/octokit-link';
-import { octokitToken } from '../octokit.token';
+import {
+  LoadAuthenticatedRepositoriesFn,
+  loadAuthenticatedRepositoriesToken,
+} from './load-authenticated-repositories';
 import { Repositories } from './repository';
 
 interface Pagination {
@@ -21,7 +22,10 @@ interface RepositoriesState {
 export class RepositoriesStore extends ComponentStore<RepositoriesState> {
   authenticatedRepositories$ = this.select((state) => state.repositories);
 
-  constructor(@Inject(octokitToken) private octokit: Octokit) {
+  constructor(
+    @Inject(loadAuthenticatedRepositoriesToken)
+    private loadAuthenticatedRepositories: LoadAuthenticatedRepositoriesFn
+  ) {
     super(initialState);
 
     this.#loadRepositories(this.select((state) => state.pagination));
@@ -38,29 +42,13 @@ export class RepositoriesStore extends ComponentStore<RepositoriesState> {
       concatMap(({ lastPageNumber, nextPageNumber }) =>
         lastPageNumber === null && nextPageNumber === null
           ? EMPTY
-          : from(
-              this.octokit.rest.repos.listForAuthenticatedUser({
-                page: nextPageNumber ?? undefined,
-                per_page: 100,
-              })
-            ).pipe(
+          : this.loadAuthenticatedRepositories({
+              pageNumber: nextPageNumber,
+            }).pipe(
               tapResponse(
-                ({ data, headers }) => {
-                  this.#appendRepositories(
-                    data.map(
-                      ({
-                        description,
-                        full_name: fullName,
-                        html_url: url,
-                      }) => ({
-                        description: description ?? '',
-                        fullName,
-                        url,
-                      })
-                    )
-                  );
+                ({ links, repositories }) => {
+                  this.#appendRepositories(repositories);
 
-                  const links = OctokitLinks.fromLinkHeader(headers.link ?? '');
                   this.#updatePagination({
                     lastPageNumber: links.lastPageNumber,
                     nextPageNumber: links.nextPageNumber,
