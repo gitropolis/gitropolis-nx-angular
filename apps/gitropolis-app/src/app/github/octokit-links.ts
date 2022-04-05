@@ -66,13 +66,15 @@ export class OctokitLinks {
     });
   }
 
-  private constructor(properties: Partial<OctokitLinks>) {
+  protected constructor(
+    urls: Pick<OctokitLinks, 'firstUrl' | 'lastUrl' | 'nextUrl' | 'previousUrl'>
+  ) {
     ({
       firstUrl: this.firstUrl,
       lastUrl: this.lastUrl,
       nextUrl: this.nextUrl,
       previousUrl: this.previousUrl,
-    } = properties);
+    } = urls);
   }
 
   #pageNumber(url: URL): number | null {

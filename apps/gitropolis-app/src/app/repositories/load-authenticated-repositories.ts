@@ -1,7 +1,7 @@
 import { inject, InjectionToken } from '@angular/core';
 import { from, map, Observable } from 'rxjs';
 
-import { OctokitLinks } from '../github/octokit-link';
+import { OctokitLinks } from '../github/octokit-links';
 import { octokitToken } from '../octokit.token';
 import { Repositories } from './repository';
 

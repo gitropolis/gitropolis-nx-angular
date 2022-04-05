@@ -16,7 +16,9 @@ interface RepositoriesState {
 
 @Injectable()
 export class RepositoriesStore extends ComponentStore<RepositoriesState> {
-  authenticatedRepositories$ = this.select((state) => state.repositories);
+  authenticatedRepositories$: Observable<Repositories> = this.select(
+    (state) => state.repositories
+  );
 
   constructor(
     @Inject(loadAuthenticatedRepositoriesToken)
