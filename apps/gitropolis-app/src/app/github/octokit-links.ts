@@ -38,6 +38,7 @@ export class OctokitLinks {
     const links: readonly OctokitLink[] = linkHeader
       .split(',')
       .map((linkPart) => linkPart.trim())
+      .filter((linkPart) => linkPart !== '')
       .map((linkPart): LinkPatternNamedGroups => {
         const namedGroups: LinkPatternNamedGroups | undefined =
           linkPattern.exec(linkPart)?.groups as

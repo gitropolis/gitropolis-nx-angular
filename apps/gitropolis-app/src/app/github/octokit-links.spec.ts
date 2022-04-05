@@ -1,6 +1,6 @@
-import { OctokitLinks } from './octokit-link';
+import { OctokitLinks } from './octokit-links';
 
-describe('OctokitLinks', () => {
+describe(OctokitLinks.name, () => {
   it(`
   Given the first page of authenticated repositories is listed
   Then the "Link" header is transformed`, () => {
