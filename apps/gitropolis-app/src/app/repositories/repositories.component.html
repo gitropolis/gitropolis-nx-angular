@@ -1,31 +1,8 @@
-<div class="mat-elevation-z8">
-  <table mat-table class="full-width-table" matSort aria-label="Elements">
-    <ng-container matColumnDef="fullName">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
-      <td mat-cell *matCellDef="let row">{{ row.fullName }}</td>
-    </ng-container>
-
-    <ng-container matColumnDef="description">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>Description</th>
-      <td mat-cell *matCellDef="let row">{{ row.description }}</td>
-    </ng-container>
-
-    <ng-container matColumnDef="url">
-      <th mat-header-cell *matHeaderCellDef mat-sort-header>URL</th>
-      <td mat-cell *matCellDef="let row">{{ row.url }}</td>
-    </ng-container>
-
-    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-  </table>
-
-  <!-- [length]="dataSource?.data?.length" -->
-  <mat-paginator
-    #paginator
-    [pageIndex]="0"
-    [pageSize]="10"
-    [pageSizeOptions]="[5, 10, 20]"
-    aria-label="Select page"
-  >
-  </mat-paginator>
-</div>
+<mat-list>
+  <mat-list-item *rxFor="let repository of repositories$">
+    <mat-icon mat-list-icon>folder</mat-icon>
+    <div mat-line>{{ repository.fullName }}</div>
+    <div mat-line>{{ repository.description }}</div>
+  </mat-list-item>
+  <mat-divider></mat-divider>
+</mat-list>

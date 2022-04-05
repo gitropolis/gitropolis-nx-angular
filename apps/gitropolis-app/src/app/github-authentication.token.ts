@@ -1,10 +1,12 @@
 import { InjectionToken } from '@angular/core';
 
 function askUserForPersonalAccessToken(): string {
+  const _prompt = globalThis.prompt ?? (() => null);
+
   let personalAccessToken: string | null = null;
 
   do {
-    personalAccessToken = prompt(
+    personalAccessToken = _prompt(
       'Enter your GitHub Personal Access Token (PAT)'
     );
   } while (personalAccessToken === null || personalAccessToken === '');
