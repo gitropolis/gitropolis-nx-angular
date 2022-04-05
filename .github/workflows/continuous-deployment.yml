@@ -21,6 +21,23 @@ concurrency:
   cancel-in-progress: ${{ github.event_name != 'push' }}
 
 jobs:
+  lint:
+    name: Unit and integration tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          cache: yarn
+          node-version-file: .nvmrc
+      - name: Install package dependencies
+        run: yarn install --frozen-lockfile --non-interactive
+
+      - name: Lint all projects
+        run: yarn nx lint
+
   test:
     name: Unit and integration tests
     runs-on: ubuntu-latest
@@ -35,7 +52,7 @@ jobs:
       - name: Install package dependencies
         run: yarn install --frozen-lockfile --non-interactive
 
-      - name: Run unit and integration tests
+      - name: Run all unit and integration tests
         run: yarn test
 
   build:
@@ -52,7 +69,7 @@ jobs:
       - name: Install package dependencies
         run: yarn install --frozen-lockfile --non-interactive
 
-      - name: Build website
+      - name: Build web app
         run: yarn build
       - name: Upload web app build artifact
         uses: actions/upload-artifact@v3
@@ -66,6 +83,7 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs:
       - build
+      - lint
       - test
     runs-on: ubuntu-latest
 
