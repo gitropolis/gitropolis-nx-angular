@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, NgModule } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { ForModule } from '@rx-angular/template/experimental/for';
-import { PushModule } from '@rx-angular/template/push';
 
 import { RepositoriesStore } from './repositories.store';
 
@@ -22,6 +21,6 @@ export class RepositoriesComponent {
 @NgModule({
   declarations: [RepositoriesComponent],
   exports: [RepositoriesComponent],
-  imports: [ForModule, MatIconModule, MatListModule, PushModule],
+  imports: [ForModule, MatIconModule, MatListModule],
 })
 export class RepositoriesScam {}
