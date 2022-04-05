@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   lint:
-    name: Unit and integration tests
+    name: Lint
     runs-on: ubuntu-latest
 
     steps:
