@@ -5,10 +5,10 @@ import { OctokitLinks } from '../github/octokit-link';
 import { octokitToken } from '../octokit.token';
 import { Repositories } from './repository';
 
-interface LoadAuthenticatedRepositoriesOptions {
+export interface LoadAuthenticatedRepositoriesOptions {
   readonly pageNumber?: number | null;
 }
-interface LoadAuthenticatedRepositoriesResponse {
+export interface LoadAuthenticatedRepositoriesResponse {
   readonly links: OctokitLinks;
   readonly repositories: Repositories;
 }

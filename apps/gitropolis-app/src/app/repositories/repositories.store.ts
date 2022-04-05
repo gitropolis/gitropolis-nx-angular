@@ -1,25 +1,18 @@
 import { Inject, Injectable } from '@angular/core';
 import { ComponentStore, tapResponse } from '@ngrx/component-store';
-import { concatMap, filter, map, pipe } from 'rxjs';
+import { concatMap, EMPTY, expand, Observable, pipe } from 'rxjs';
 
 import {
   LoadAuthenticatedRepositoriesFn,
+  LoadAuthenticatedRepositoriesOptions,
+  LoadAuthenticatedRepositoriesResponse,
   loadAuthenticatedRepositoriesToken,
 } from './load-authenticated-repositories';
 import { Repositories } from './repository';
 
-interface Pagination {
-  readonly lastPageNumber: number | null;
-  readonly nextPageNumber: number | null;
-}
-
 interface RepositoriesState {
-  readonly pagination: Pagination;
   readonly repositories: Repositories;
 }
-
-const isLastPage = ({ lastPageNumber, nextPageNumber }: Pagination): boolean =>
-  lastPageNumber === null && nextPageNumber === null;
 
 @Injectable()
 export class RepositoriesStore extends ComponentStore<RepositoriesState> {
@@ -31,7 +24,7 @@ export class RepositoriesStore extends ComponentStore<RepositoriesState> {
   ) {
     super(initialState);
 
-    this.#loadRepositoriesOnNextPage(this.select((state) => state.pagination));
+    this.#loadRepositories();
   }
 
   #appendRepositories = this.updater<Repositories>(
@@ -40,41 +33,38 @@ export class RepositoriesStore extends ComponentStore<RepositoriesState> {
       repositories: [...state.repositories, ...loadedRepositories],
     })
   );
-  #loadRepositoriesOnNextPage = this.effect<Pagination>(
+  #loadRepositories = this.effect<void>(
     pipe(
-      filter((pagination) => !isLastPage(pagination)),
-      map(({ nextPageNumber }) => nextPageNumber as number),
-      concatMap((nextPageNumber) =>
-        this.loadAuthenticatedRepositories({
-          pageNumber: nextPageNumber,
-        }).pipe(
-          tapResponse(
-            ({ links, repositories }) => {
-              this.#appendRepositories(repositories);
-
-              this.#updatePagination({
-                lastPageNumber: links.lastPageNumber,
-                nextPageNumber: links.nextPageNumber,
-              });
-            },
-            (error: unknown) => {
-              console.error(String(error));
-            }
+      concatMap(() =>
+        this.#loadRepositoriesPage().pipe(
+          // Recurse until there are no more pages.
+          expand(({ links }) =>
+            links.isLastPage
+              ? EMPTY
+              : this.#loadRepositoriesPage({ pageNumber: links.nextPageNumber })
           )
         )
       )
     )
   );
-  #updatePagination = this.updater<Pagination>((state, pagination) => ({
-    ...state,
-    pagination,
-  }));
+  #loadRepositoriesPage({
+    pageNumber,
+  }: LoadAuthenticatedRepositoriesOptions = {}): Observable<LoadAuthenticatedRepositoriesResponse> {
+    return this.loadAuthenticatedRepositories({
+      pageNumber,
+    }).pipe(
+      tapResponse(
+        ({ repositories }) => {
+          this.#appendRepositories(repositories);
+        },
+        (error: unknown) => {
+          console.error(String(error));
+        }
+      )
+    );
+  }
 }
 
 const initialState: RepositoriesState = {
-  pagination: {
-    nextPageNumber: 1,
-    lastPageNumber: null,
-  },
   repositories: [],
 };

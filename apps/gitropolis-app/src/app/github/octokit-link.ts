@@ -12,6 +12,9 @@ type OctokitLinkRel = 'first' | 'last' | 'next' | 'prev';
 const hasRel = (rel: OctokitLinkRel) => (link: OctokitLink) => link.rel === rel;
 
 export class OctokitLinks {
+  get isLastPage(): boolean {
+    return this.nextPageNumber === null && this.lastPageNumber === null;
+  }
   readonly firstUrl?: URL;
   get firstPageNumber(): number | null {
     return this.firstUrl ? this.#pageNumber(this.firstUrl) : null;

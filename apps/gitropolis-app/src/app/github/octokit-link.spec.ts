@@ -16,6 +16,7 @@ describe('OctokitLinks', () => {
     expect(actualLinks).toEqual(expectedLinks);
     expect(actualLinks.lastPageNumber).toBe(3);
     expect(actualLinks.nextPageNumber).toBe(2);
+    expect(actualLinks.isLastPage).toBe(false);
   });
 
   it(`
@@ -41,6 +42,7 @@ describe('OctokitLinks', () => {
     expect(actualLinks.lastPageNumber).toBe(3);
     expect(actualLinks.nextPageNumber).toBe(3);
     expect(actualLinks.previousPageNumber).toBe(1);
+    expect(actualLinks.isLastPage).toBe(false);
   });
 
   it(`
@@ -62,5 +64,6 @@ describe('OctokitLinks', () => {
     expect(actualLinks).toEqual(expectedLinks);
     expect(actualLinks.firstPageNumber).toBe(1);
     expect(actualLinks.previousPageNumber).toBe(2);
+    expect(actualLinks.isLastPage).toBe(true);
   });
 });
