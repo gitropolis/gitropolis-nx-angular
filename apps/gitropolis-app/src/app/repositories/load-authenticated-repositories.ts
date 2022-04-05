@@ -6,10 +6,21 @@ import { octokitToken } from '../octokit.token';
 import { Repositories } from './repository';
 
 export interface LoadAuthenticatedRepositoriesOptions {
+  /**
+   * The numbered page of repositories to load.
+   *
+   * Defaults to the first page.
+   */
   readonly pageNumber?: number | null;
 }
 export interface LoadAuthenticatedRepositoriesResponse {
+  /**
+   * The links parsed from the response.
+   */
   readonly links: OctokitLinks;
+  /**
+   * The loaded repositories page.
+   */
   readonly repositories: Repositories;
 }
 
