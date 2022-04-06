@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@angular/core';
 import { ComponentStore, tapResponse } from '@ngrx/component-store';
-import { concatMap, EMPTY, expand, Observable, pipe } from 'rxjs';
+import { concatMap, EMPTY, expand, map, Observable, pipe, scan, tap } from 'rxjs';
 
 import {
   LoadAuthenticatedRepositoriesFn,
@@ -29,12 +29,6 @@ export class RepositoriesStore extends ComponentStore<RepositoriesState> {
     this.#loadRepositories();
   }
 
-  #appendRepositories = this.updater<Repositories>(
-    (state, loadedRepositories): RepositoriesState => ({
-      ...state,
-      repositories: [...state.repositories, ...loadedRepositories],
-    })
-  );
   #loadRepositories = this.effect<void>(
     pipe(
       concatMap(() =>
@@ -46,8 +40,23 @@ export class RepositoriesStore extends ComponentStore<RepositoriesState> {
               : this.#loadRepositoriesPage({ pageNumber: links.nextPageNumber })
           )
         )
-      )
+      ),
+      map(({ repositories }) => repositories),
+      scan(
+        (storedRepositories, repositories) => [
+          ...storedRepositories,
+          ...repositories,
+        ],
+        [] as Repositories
+      ),
+      tap((repositories) => this.#updateRepositories(repositories))
     )
+  );
+  #updateRepositories = this.updater<Repositories>(
+    (state, repositories): RepositoriesState => ({
+      ...state,
+      repositories,
+    })
   );
   #loadRepositoriesPage({
     pageNumber,
@@ -56,9 +65,7 @@ export class RepositoriesStore extends ComponentStore<RepositoriesState> {
       pageNumber,
     }).pipe(
       tapResponse(
-        ({ repositories }) => {
-          this.#appendRepositories(repositories);
-        },
+        () => undefined,
         (error: unknown) => {
           console.error(String(error));
         }
