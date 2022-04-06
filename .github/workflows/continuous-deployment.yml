@@ -69,8 +69,13 @@ jobs:
       - name: Install package dependencies
         run: yarn install --frozen-lockfile --non-interactive
 
+      - name: Get GitHub repository name
+        id: repository-name
+        run: echo "::set-output name=name::$(echo '${{ github.repository }}' | awk -F '/' '{print $2}')"
       - name: Build web app
-        run: yarn build
+        run: yarn build --base-href=/${{ steps.repository-name.outputs.name }}/
+      - name: Add 404 page with GitHub Pages support
+        run: cp build/github-pages/404.html ./dist/apps/${{ env.build-artifact-name }}/
       - name: Upload web app build artifact
         uses: actions/upload-artifact@v3
         with:
